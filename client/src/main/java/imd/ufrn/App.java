@@ -7,7 +7,8 @@ import java.io.InputStreamReader;
 public class App {
     public static void main(String[] args) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            // create stub passing port
+            // SocketStub stub = new SocketStub();
+
             while (true) {
                 System.out.println("\n*** Cat Management System ***");
                 System.out.println("1. Register Cat");
@@ -29,7 +30,13 @@ public class App {
                         System.out.print("Enter owner: ");
                         String owner = reader.readLine();
                         String parameters = id + ";" + name + ";" + color + ";" + owner;
-                        // Call stub of createCat passing the parameters (name, color, owner);
+                        try {
+                            // stubCliente.sendMessage("CreateCat", parameters);
+                            System.out.println("Cat saved!");
+                        } catch (RuntimeException e) {
+                            System.out.println("Failed to save cat");
+
+                        }
                         break;
                     case "2":
                         System.out.print("Enter id (for update): ");
@@ -41,17 +48,34 @@ public class App {
                         System.out.print("Enter owner (for update): ");
                         String ownerUpdate = reader.readLine();
                         String parametersUpdate = idUpdate + ";" + nameUpdate + ";" + colorUpdate + ";" + ownerUpdate;
-                        // Call stub of updateCat passing the parameters (nameUpdate, colorUpdate,
-                        // ownerUpdate);
+                        try {
+                            // stubCliente.sendMessage("UpdateCat", parameters);
+                            System.out.println("Cat updated!");
+                        } catch (RuntimeException e) {
+                            System.out.println("Failed to update cat");
+
+                        }
                         break;
                     case "3":
                         System.out.print("Enter id (to read): ");
                         String idRead = reader.readLine();
-                        // Call stub of readCat passing the parameter(idRead);
+                        try {
+                            // String response = stubCliente.sendMessage("ReadCat", idRead);
+                            // System.out.println(response);
+                        } catch (RuntimeException e) {
+                            System.out.println("Failed to read cat");
+
+                        }
                     case "4":
                         System.out.print("Enter id (to delete): ");
                         String idDelete = reader.readLine();
-                        // Call stub of deleteCat passing the parameter(idDelete);
+                        try {
+                            // stubCliente.sendMessage("DeleteCat", idDelete);
+                            System.out.println("Cat deleted");
+                        } catch (RuntimeException e) {
+                            System.out.println("Failed to read cat");
+
+                        }
                         break;
                     case "5":
                         // stub.close();
