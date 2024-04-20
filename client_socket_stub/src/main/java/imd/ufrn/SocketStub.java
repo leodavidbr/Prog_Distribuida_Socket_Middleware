@@ -24,9 +24,9 @@ public class SocketStub implements Runnable {
         initializeConnectionWithNameService();
     }
 
-    public void sendMessage(String serviceName, String request) {
+    public void sendMessage(String serviceName, String requestParams) {
         Address serviceAddress = findService(serviceName);
-        connectSocketSendRecieveFromService(serviceAddress, request);
+        connectSocketSendRecieveFromService(serviceAddress, requestParams);
     }
 
     private void handleMessageRecieved(String message) {
