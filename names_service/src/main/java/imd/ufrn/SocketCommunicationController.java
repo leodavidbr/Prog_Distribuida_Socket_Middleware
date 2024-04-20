@@ -26,7 +26,7 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     private NewConnectionThread newConnectionRunnable;
     private Thread newConnectionThread;
 
-    private int port = 9999;
+    private int port = 8888;
 
     public SocketCommunicationController(Consumer<MessageRecieved> callbackFunctionMessageRecieved, int port) {
         super(callbackFunctionMessageRecieved);

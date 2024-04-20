@@ -15,10 +15,8 @@ import imd.services.UpdateCat;
 public class App {
     public static void main(String[] args) {
         try {
-            Socket clientNamesService = new Socket();
-            // inform host and port
-            ServerSocket server = new ServerSocket();
-            // inform port
+            Socket clientNamesService = new Socket("127.0.0.1", 8888);
+            ServerSocket server = new ServerSocket(9999);
             Socket client;
 
             PrintWriter write = new PrintWriter(clientNamesService.getOutputStream(), true);
@@ -68,11 +66,8 @@ public class App {
 
         Integer port = 9999;
 
-        String message = "subscribeService;" + CreateCat.getMessage() + ";" + host + ";" + port;
+        String message = "subscribeService;catService;" + host + ";" + port;
 
         write.println(message);
-        read.readLine();
-        // format: subscribeService;serviceName;host;port
-        // should be all of them?
     }
 }

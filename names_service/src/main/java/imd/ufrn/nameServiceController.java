@@ -24,7 +24,7 @@ public class nameServiceController {
     }
 
     private void handleMessageRecieved(MessageRecieved messageRecieved) {
-        List<String> messageTokens = Arrays.asList(messageRecieved.getMessage().split(","));
+        List<String> messageTokens = Arrays.asList(messageRecieved.getMessage().split(";"));
         String command = messageTokens.get(0);
         List<String> argumentsMessage = messageTokens.subList(1, messageTokens.size());
 
