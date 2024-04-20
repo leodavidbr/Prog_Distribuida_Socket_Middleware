@@ -11,9 +11,8 @@ public class CreateCat {
         CreateCat.cats = cats;
     }
 
-    public static String registerCat(String parameters) {
-        String[] parts = parameters.split(";");
-        Cat newCat = new Cat(parts[1], parts[2], parts[3], parts[4]);
+    public static String registerCat(List<String> parameters) {
+        Cat newCat = new Cat(parameters.get(1), parameters.get(2), parameters.get(3), parameters.get(4));
         cats.add(newCat);
         return "Cat created: " + newCat.getName();
     }

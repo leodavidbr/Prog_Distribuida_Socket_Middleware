@@ -14,6 +14,7 @@ import imd.ufrn.model.MessageRecieved;
 // ex: getService;catsService
 public class nameServiceController {
     BaseCommunicationWithServerController communicationWithServerController;
+    // Map of serviceName to host;port
     Map<String, String> namesSubscribed = new HashMap<>();
     String subscribeServiceCode = "subscribeService";
     String getServiceCode = "getService";

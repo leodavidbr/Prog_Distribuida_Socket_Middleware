@@ -11,7 +11,9 @@ public class ReadCat {
         ReadCat.cats = cats;
     }
 
-    public static String readCat(String id) {
+    public static String readCat(List<String> parameters) {
+        String id = parameters.get(0);
+
         for (int i = 0; i < cats.size(); i++) {
             if (cats.get(i).getId().equals(id)) {
                 return "Cat Details - Name: " + cats.get(i).getName() + ", Color: " + cats.get(i).getColor()

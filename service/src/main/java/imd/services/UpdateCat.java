@@ -11,13 +11,12 @@ public class UpdateCat {
         UpdateCat.cats = cats;
     }
 
-    public static String updateCat(String parameters) {
-        String[] parts = parameters.split(";");
+    public static String updateCat(List<String> parameters) {
         for (Cat cat : cats) {
-            if (cat.getId().equals(parts[1])) {
-                cat.setName(parts[2]);
-                cat.setColor(parts[3]);
-                cat.setOwner(parts[4]);
+            if (cat.getId().equals(parameters.get(1))) {
+                cat.setName(parameters.get(2));
+                cat.setColor(parameters.get(3));
+                cat.setOwner(parameters.get(4));
             }
         }
         return "Cat updated";

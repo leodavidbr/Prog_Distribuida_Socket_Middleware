@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 
 import imd.services.CreateCat;
 import imd.services.DeleteCat;
@@ -33,23 +35,25 @@ public class App {
                     read = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
                     String request = read.readLine();
-                    String[] reqParameters = request.split(";");
-                    String serviceName = reqParameters[0];
+                    List<String> reqParameters = Arrays.asList(request.split(";"));
+
+                    String serviceName = reqParameters.get(0);
                     switch (serviceName) {
                         case "CreateCat":
-                            CreateCat.registerCat(reqParameters[1]);
+                            CreateCat.registerCat(reqParameters);
                             break;
                         case "UpdateCat":
-                            UpdateCat.updateCat(reqParameters[1]);
+                            UpdateCat.updateCat(reqParameters);
                             break;
                         case "DeleteCat":
-                            DeleteCat.deleteCat(reqParameters[1]);
+                            DeleteCat.deleteCat(reqParameters);
                             break;
                         case "ReadCat":
-                            ReadCat.readCat(reqParameters[1]);
+                            ReadCat.readCat(reqParameters);
                             break;
                         default:
                     }
+                    client.close();
                 } catch (IOException e) {
 
                 }
