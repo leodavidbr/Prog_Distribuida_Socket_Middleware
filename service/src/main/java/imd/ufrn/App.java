@@ -38,20 +38,24 @@ public class App {
                     List<String> reqParameters = Arrays.asList(request.split(";"));
 
                     String serviceName = reqParameters.get(0);
+                    String responseToSend = "";
                     switch (serviceName) {
                         case "CreateCat":
-                            CreateCat.registerCat(reqParameters);
+                            responseToSend = CreateCat.registerCat(reqParameters);
                             break;
                         case "UpdateCat":
-                            UpdateCat.updateCat(reqParameters);
+                            responseToSend = UpdateCat.updateCat(reqParameters);
                             break;
                         case "DeleteCat":
-                            DeleteCat.deleteCat(reqParameters);
+                            responseToSend = DeleteCat.deleteCat(reqParameters);
                             break;
                         case "ReadCat":
-                            ReadCat.readCat(reqParameters);
+                            responseToSend = ReadCat.readCat(reqParameters);
                             break;
                         default:
+                    }
+                    if (responseToSend != "") {
+                        sendResponseToClient(write, responseToSend);
                     }
                     client.close();
                 } catch (IOException e) {
@@ -73,5 +77,9 @@ public class App {
         String message = "subscribeService;catService;" + host + ";" + port;
 
         write.println(message);
+    }
+
+    private static void sendResponseToClient(PrintWriter write, String response) {
+        write.write(response);
     }
 }
