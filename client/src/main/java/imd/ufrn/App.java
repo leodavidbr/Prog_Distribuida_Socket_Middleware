@@ -8,7 +8,11 @@ public class App {
 
     public static void main(String[] args) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            System.out.println("creating stub");
             SocketStub stubClient = new SocketStub(message -> handleMessageRecieved(message));
+            Thread stubThread = new Thread(stubClient);
+            stubThread.start();
+            System.out.println("stub created");
 
             while (true) {
                 System.out.println("\n*** Cat Management System ***");
@@ -90,6 +94,6 @@ public class App {
     }
 
     private static void handleMessageRecieved(String message) {
-
+        System.out.println(message);
     }
 }

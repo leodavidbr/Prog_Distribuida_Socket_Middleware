@@ -30,34 +30,54 @@ public class App {
 
             while (true) {
                 try {
+                    System.out.println();
+                    System.out.println("---------------- new loop iteration ----------------");
+                    System.out.println();
+                    System.out.println("waiting to accept client connection");
                     client = server.accept();
+                    System.out.println("connection succesfuly done with port: " + client.getPort());
                     write = new PrintWriter(client.getOutputStream(), true);
                     read = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
+                    System.out.println("trying to readLine");
                     String request = read.readLine();
+                    System.out.println("readLine succesfull, read: \"" + request + "\"");
                     List<String> reqParameters = Arrays.asList(request.split(";"));
 
                     String serviceName = reqParameters.get(0);
                     String responseToSend = "";
                     switch (serviceName) {
                         case "CreateCat":
+                            System.out.println("create cat request");
                             responseToSend = CreateCat.registerCat(reqParameters);
+                            System.out.println("request processed. Will send response");
                             break;
                         case "UpdateCat":
+                            System.out.println("update cat request");
                             responseToSend = UpdateCat.updateCat(reqParameters);
+                            System.out.println("request processed. Will send response");
                             break;
                         case "DeleteCat":
+                            System.out.println("delete cat request");
                             responseToSend = DeleteCat.deleteCat(reqParameters);
+                            System.out.println("request processed. Will send response");
                             break;
                         case "ReadCat":
+                            System.out.println("read cat request");
                             responseToSend = ReadCat.readCat(reqParameters);
+                            System.out.println("request processed. Will send response");
                             break;
                         default:
+                            System.out
+                                    .println("request malformed. Could not identify method with name: " + serviceName);
                     }
                     if (responseToSend != "") {
+                        System.out.println("will send response to client with content: \"" + responseToSend + "\"");
                         sendResponseToClient(write, responseToSend);
+                        System.out.println("response sent");
                     }
                     client.close();
+                    System.out.println("connection closed. Will restart listening to client");
                 } catch (IOException e) {
 
                 }
@@ -80,6 +100,6 @@ public class App {
     }
 
     private static void sendResponseToClient(PrintWriter write, String response) {
-        write.write(response);
+        write.println(response);
     }
 }

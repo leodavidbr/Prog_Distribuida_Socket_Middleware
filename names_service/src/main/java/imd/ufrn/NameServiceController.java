@@ -12,19 +12,23 @@ import imd.ufrn.model.MessageRecieved;
 // ex:  subscribeService;catsService;127.0.0.1;9999 
 // message for get service should be of the format: "getService;serviceName"
 // ex: getService;catsService
-public class nameServiceController {
+public class NameServiceController {
     BaseCommunicationWithServerController communicationWithServerController;
     // Map of serviceName to host;port
     Map<String, String> namesSubscribed = new HashMap<>();
     String subscribeServiceCode = "subscribeService";
     String getServiceCode = "getService";
+    Thread communicationWithServerControllerThread;
 
-    public nameServiceController() {
+    public NameServiceController() {
         communicationWithServerController = new SocketCommunicationController(
                 messageRecieved -> handleMessageRecieved(messageRecieved));
+        communicationWithServerControllerThread = new Thread(communicationWithServerController);
+        communicationWithServerControllerThread.start();
     }
 
     private void handleMessageRecieved(MessageRecieved messageRecieved) {
+        System.out.println("handleMessageRecieved: \"" + messageRecieved + "\"");
         List<String> messageTokens = Arrays.asList(messageRecieved.getMessage().split(";"));
         String command = messageTokens.get(0);
         List<String> argumentsMessage = messageTokens.subList(1, messageTokens.size());

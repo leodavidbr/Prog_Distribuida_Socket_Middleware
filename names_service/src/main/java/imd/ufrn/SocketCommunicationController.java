@@ -36,6 +36,7 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
             throw new CouldNotInitializeSocketException(
                     "Socket could not initialize correctly. With port: " + this.port);
         }
+        System.out.println(" nameService initialized correctly with port: " + this.port);
     }
 
     public SocketCommunicationController(Consumer<MessageRecieved> callbackFunctionMessageRecieved) {
@@ -45,6 +46,7 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
             throw new CouldNotInitializeSocketException(
                     "Socket could not initialize correctly. With port: " + this.port);
         }
+        System.out.println(" nameService initialized correctly with port: " + this.port);
     }
 
     @Override
@@ -53,9 +55,16 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     }
 
     private void getMessageLoop() {
-        String message;
+        System.out.println("initilizing socket getMessageLoop");
+        String message = "";
         try {
             while (true) {
+                System.out.println();
+                System.out.println("---------------- new loop iteration ----------------");
+                System.out.println();
+                System.out.println("sockets list size: " + clientSockets.size());
+                while (clientSockets.size() == 0) {
+                }
                 for (int i = 0; i < clientSockets.size(); ++i) {
                     message = getMessage(i);
                     System.out.println("Message recieved from client number " + i + ": " + message);
@@ -73,6 +82,7 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
 
     @Override
     public synchronized void sendMessage(String message, int clientIdx) {
+        System.out.println("sending message: \"" + message + "\" for socket number: " + clientIdx);
         if (message == null || message.length() == 0) {
             return;
         }
@@ -85,16 +95,29 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     protected boolean initialize() {
         if (!initializeSocket())
             return false;
+        System.out.println("socket initilized");
+
+        System.out.println("initilizing newConnectionThread");
         newConnectionRunnable = new NewConnectionThread(serverSocket,
                 newClientSocket -> handleNewClientSocket(newClientSocket));
         newConnectionThread = new Thread(newConnectionRunnable);
+        newConnectionThread.start();
+        System.out.println("initialized newConnectionThread");
+
         return true;
     }
 
     private void handleNewClientSocket(Socket socket) {
         Optional<ClientSocket> newClientSocket = initializeReadAndWriteStream(socket);
         if (newClientSocket.isPresent()) {
+            System.out.println("the new socket was was initialized. Adding to the list");
             clientSockets.add(newClientSocket.get());
+
+            System.out.println("added. Updated list: ");
+            System.out.println("size: " + clientSockets.size());
+            for (int i = 0; i < clientSockets.size(); ++i) {
+                System.out.println("idx: " + i + " port: " + clientSockets.get(i).getSocket().getPort());
+            }
         }
     }
 
@@ -110,7 +133,9 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     }
 
     private Optional<ClientSocket> initializeReadAndWriteStream(Socket socket) {
+        System.out.println("Initializing Read and Write stream for socket");
         ClientSocket newClientSocket = new ClientSocket(socket);
+
         try {
             newClientSocket.setReadStream(new BufferedReader(new InputStreamReader(socket.getInputStream())));
         } catch (IOException e) {
@@ -132,7 +157,11 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     private String getMessage(int clientIdx) throws IOException {
         String message = "";
         ClientSocket clientSocket = clientSockets.get(clientIdx);
-        message = clientSocket.getReadStream().readLine();
+        System.out.println("will try to readLine from client of idx: " + clientIdx);
+        while (message == "") {
+            message = clientSocket.getReadStream().readLine();
+        }
+        System.out.println("finished readLine from client of idx: " + clientIdx + " with content: \"" + message + "\"");
 
         return message;
     }
