@@ -1,14 +1,19 @@
 package imd.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import imd.ufrn.models.Cat;
 
 public class UpdateCat {
-    private static List<Cat> cats;
+    private static List<Cat> cats = new ArrayList<>();
 
     public UpdateCat(List<Cat> cats) {
         UpdateCat.cats = cats;
+    }
+
+    public static void setCatsList(List<Cat> catsList) {
+        UpdateCat.cats = catsList;
     }
 
     public static String updateCat(List<String> parameters) {

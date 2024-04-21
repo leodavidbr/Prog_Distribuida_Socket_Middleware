@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,9 +14,16 @@ import imd.services.CreateCat;
 import imd.services.DeleteCat;
 import imd.services.ReadCat;
 import imd.services.UpdateCat;
+import imd.ufrn.models.Cat;
 
 public class App {
     public static void main(String[] args) {
+        List<Cat> catsDataBase = new ArrayList<>();
+        CreateCat.setCatsList(catsDataBase);
+        DeleteCat.setCatsList(catsDataBase);
+        ReadCat.setCatsList(catsDataBase);
+        UpdateCat.setCatsList(catsDataBase);
+
         try {
             Socket clientNamesService = new Socket("127.0.0.1", 8888);
             ServerSocket server = new ServerSocket(9999);
@@ -94,7 +102,7 @@ public class App {
 
         Integer port = 9999;
 
-        String message = "subscribeService;catService;" + host + ";" + port;
+        String message = "subscribeService;CatService;" + host + ";" + port;
 
         write.println(message);
     }

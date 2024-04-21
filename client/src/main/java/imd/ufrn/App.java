@@ -34,9 +34,9 @@ public class App {
                         String color = reader.readLine();
                         System.out.print("Enter owner: ");
                         String owner = reader.readLine();
-                        String parameters = id + ";" + name + ";" + color + ";" + owner;
+                        String parameters = "CreateCat" + ";" + id + ";" + name + ";" + color + ";" + owner;
                         try {
-                            stubClient.sendMessage("CreateCat", parameters);
+                            stubClient.sendMessage("CatService", parameters);
                             System.out.println("Cat saved!");
                         } catch (RuntimeException e) {
                             System.out.println("Failed to save cat");
@@ -52,9 +52,10 @@ public class App {
                         String colorUpdate = reader.readLine();
                         System.out.print("Enter owner (for update): ");
                         String ownerUpdate = reader.readLine();
-                        String parametersUpdate = idUpdate + ";" + nameUpdate + ";" + colorUpdate + ";" + ownerUpdate;
+                        String parametersUpdate = "UpdateCat" + ";" + idUpdate + ";" + nameUpdate + ";" + colorUpdate
+                                + ";" + ownerUpdate;
                         try {
-                            stubClient.sendMessage("UpdateCat", parametersUpdate);
+                            stubClient.sendMessage("CatService", parametersUpdate);
                             System.out.println("Cat updated!");
                         } catch (RuntimeException e) {
                             System.out.println("Failed to update cat");
@@ -64,8 +65,9 @@ public class App {
                     case "3":
                         System.out.print("Enter id (to read): ");
                         String idRead = reader.readLine();
+                        String parametersRead = "ReadCat" + ";" + idRead;
                         try {
-                            stubClient.sendMessage("ReadCat", idRead);
+                            stubClient.sendMessage("CatService", parametersRead);
                         } catch (RuntimeException e) {
                             System.out.println("Failed to read cat");
 
@@ -73,8 +75,9 @@ public class App {
                     case "4":
                         System.out.print("Enter id (to delete): ");
                         String idDelete = reader.readLine();
+                        String parametersDelete = "DeleteCat" + ";" + idDelete;
                         try {
-                            stubClient.sendMessage("DeleteCat", idDelete);
+                            stubClient.sendMessage("CatService", parametersDelete);
                             System.out.println("Cat deleted");
                         } catch (RuntimeException e) {
                             System.out.println("Failed to read cat");

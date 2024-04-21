@@ -16,8 +16,8 @@ public class NameServiceController {
     BaseCommunicationWithServerController communicationWithServerController;
     // Map of serviceName to host;port
     Map<String, String> namesSubscribed = new HashMap<>();
-    String subscribeServiceCode = "subscribeService";
-    String getServiceCode = "getService";
+    static final String subscribeServiceCode = "subscribeService";
+    static final String getServiceCode = "getService";
     Thread communicationWithServerControllerThread;
 
     public NameServiceController() {
@@ -28,18 +28,21 @@ public class NameServiceController {
     }
 
     private void handleMessageRecieved(MessageRecieved messageRecieved) {
-        System.out.println("handleMessageRecieved: \"" + messageRecieved + "\"");
+        System.out.println("handleMessageRecieved: \"" + messageRecieved.getMessage() + "\"");
+
         List<String> messageTokens = Arrays.asList(messageRecieved.getMessage().split(";"));
         String command = messageTokens.get(0);
+        System.out.println("message command is: \"" + command + "\"");
+
         List<String> argumentsMessage = messageTokens.subList(1, messageTokens.size());
 
-        if (command == subscribeServiceCode) {
+        if (command.equals(subscribeServiceCode)) {
             handleSubscribeMessage(argumentsMessage, messageRecieved.getClientIdx());
-        } else if (command == getServiceCode) {
+        } else if (command.equals(getServiceCode)) {
             handleGetMessage(argumentsMessage, messageRecieved.getClientIdx());
         } else {
             System.out.println(
-                    "Type of request not recognized: " + command + ". in message: " + messageRecieved);
+                    "Type of request not recognized: \"" + command + "\" in message: " + messageRecieved.getMessage());
         }
 
     }
@@ -49,12 +52,23 @@ public class NameServiceController {
         String informationToStore = subscribeMessageArguments.get(1) + ";" + subscribeMessageArguments.get(2);
 
         namesSubscribed.put(serviceName, informationToStore);
+        System.out.println("succesfuly subscribed service of name: \"" + serviceName + "\"");
     }
 
     private void handleGetMessage(List<String> getMessageArguments, int clientIdx) {
+        System.out.println("[MAP start]");
+        int i = 0;
+        for (var name : namesSubscribed.entrySet()) {
+            System.out.println("idx: " + i + " name: \"" + name.getKey() + "\" value: \"" + name.getValue() + "\"");
+            ++i;
+        }
+        System.out.println("[MAP end]");
         String serviceName = getMessageArguments.get(0);
 
         String response = namesSubscribed.get(serviceName);
+        System.out.println("Wanted service of name \"" + serviceName + "\"" + ". Got: " + response);
+        System.out.println("will try to send response");
         communicationWithServerController.sendMessage(response, clientIdx);
+        System.out.println("finished sending response");
     }
 }

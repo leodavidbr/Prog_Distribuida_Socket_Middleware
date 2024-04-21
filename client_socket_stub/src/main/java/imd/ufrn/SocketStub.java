@@ -18,6 +18,7 @@ public class SocketStub implements Runnable {
     BufferedReader serviceReader;
 
     ReadWriteSocket nameServiceSocket;
+    private boolean connectedToNameService = false;
 
     public SocketStub(Consumer<String> callbackFunctionMessageRecieved) {
         System.out.println("[socket] entered socket constructor");
@@ -86,6 +87,7 @@ public class SocketStub implements Runnable {
     }
 
     private void initializeConnectionWithNameService() {
+        System.out.println("will try to connect to name service");
         try {
             Socket clientNamesServiceSocket = new Socket(nameServiceHost, nameServicePort);
 
@@ -97,6 +99,8 @@ public class SocketStub implements Runnable {
             System.out.println("could not initialize connection with name service");
             e.printStackTrace();
         }
+        System.out.println("connected to name service succesfully");
+        connectedToNameService = true;
     }
 
     @Override
@@ -115,11 +119,12 @@ public class SocketStub implements Runnable {
     }
 
     private String getMessage() {
+
         String message = "";
         while (message == "") {
             try {
                 if (serviceReader == null) {
-                    System.out.println("serviceReader null");
+                    // System.out.println("serviceReader null");
                 } else {
                     message = serviceReader.readLine();
                 }

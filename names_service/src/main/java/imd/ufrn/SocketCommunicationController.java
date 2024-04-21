@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import imd.ufrn.exceptions.CouldNotInitializeSocketException;
@@ -26,26 +28,32 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     private NewConnectionThread newConnectionRunnable;
     private Thread newConnectionThread;
 
+    private Lock listGreaterThan0Lock = new ReentrantLock();
+
     private int port = 8888;
 
     public SocketCommunicationController(Consumer<MessageRecieved> callbackFunctionMessageRecieved, int port) {
         super(callbackFunctionMessageRecieved);
         this.port = port;
+
         boolean isInitializedCorrectly = initialize();
         if (!isInitializedCorrectly) {
             throw new CouldNotInitializeSocketException(
                     "Socket could not initialize correctly. With port: " + this.port);
         }
+
         System.out.println(" nameService initialized correctly with port: " + this.port);
     }
 
     public SocketCommunicationController(Consumer<MessageRecieved> callbackFunctionMessageRecieved) {
         super(callbackFunctionMessageRecieved);
+
         boolean isInitializedCorrectly = initialize();
         if (!isInitializedCorrectly) {
             throw new CouldNotInitializeSocketException(
                     "Socket could not initialize correctly. With port: " + this.port);
         }
+
         System.out.println(" nameService initialized correctly with port: " + this.port);
     }
 
@@ -62,14 +70,23 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
                 System.out.println();
                 System.out.println("---------------- new loop iteration ----------------");
                 System.out.println();
-                System.out.println("sockets list size: " + clientSockets.size());
-                while (clientSockets.size() == 0) {
-                }
+
+                message = "";
+                // System.out.println("will try to acquire lock");
+                // listGreaterThan0Lock.lock();
+                // System.out.println("lock acquired");
+
+                System.out.println("  sockets list size: " + clientSockets.size());
                 for (int i = 0; i < clientSockets.size(); ++i) {
+                    System.out.println("Checking if there is message from client number: " + i);
                     message = getMessage(i);
-                    System.out.println("Message recieved from client number " + i + ": " + message);
-                    MessageRecieved messageRecieved = new MessageRecieved(message, i);
-                    callbackFunctionMessageRecieved.accept(messageRecieved);
+                    if (message != null & message != "") {
+                        System.out.println("Message recieved from client number " + i + ": \"" + message + "\"");
+                        MessageRecieved messageRecieved = new MessageRecieved(message, i);
+                        System.out.println("calling messageRecieved callback");
+                        callbackFunctionMessageRecieved.accept(messageRecieved);
+                        System.out.println("post callback");
+                    }
                 }
             }
         } catch (IOException e) {
@@ -89,10 +106,13 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
 
         ClientSocket clientSocket = clientSockets.get(clientIdx);
         clientSocket.getWriteStream().println(message);
+        System.out.println("message sent");
     }
 
     @Override
     protected boolean initialize() {
+        // listGreaterThan0Lock.lock();
+
         if (!initializeSocket())
             return false;
         System.out.println("socket initilized");
@@ -108,15 +128,27 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
     }
 
     private void handleNewClientSocket(Socket socket) {
+        System.out.println("[HANDLE_NEW_CLIENT] handle New Client called");
+
         Optional<ClientSocket> newClientSocket = initializeReadAndWriteStream(socket);
         if (newClientSocket.isPresent()) {
-            System.out.println("the new socket was was initialized. Adding to the list");
+            System.out.println("[HANDLE_NEW_CLIENT] the new socket was initialized. Adding to the list");
+
+            int clientSocketsOldSize = clientSockets.size();
+
             clientSockets.add(newClientSocket.get());
 
-            System.out.println("added. Updated list: ");
-            System.out.println("size: " + clientSockets.size());
+            if (clientSocketsOldSize == 0) {
+                System.out.println("will release list lock");
+                // listGreaterThan0Lock.unlock();
+            }
+
+            System.out.println("[HANDLE_NEW_CLIENT]   added. Updated list: ");
+            System.out.println("[HANDLE_NEW_CLIENT]   size: " + clientSockets.size());
             for (int i = 0; i < clientSockets.size(); ++i) {
-                System.out.println("idx: " + i + " port: " + clientSockets.get(i).getSocket().getPort());
+                System.out.println(
+                        "[HANDLE_NEW_CLIENT]        idx: " + i + " port: "
+                                + clientSockets.get(i).getSocket().getPort());
             }
         }
     }
@@ -161,7 +193,7 @@ public class SocketCommunicationController extends BaseCommunicationWithServerCo
         while (message == "") {
             message = clientSocket.getReadStream().readLine();
         }
-        System.out.println("finished readLine from client of idx: " + clientIdx + " with content: \"" + message + "\"");
+        System.out.println("finished readLine from client of idx: " + clientIdx + "with content: \"" + message + "\"");
 
         return message;
     }
