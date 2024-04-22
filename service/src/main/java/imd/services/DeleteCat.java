@@ -17,7 +17,7 @@ public class DeleteCat {
     }
 
     public static String deleteCat(List<String> parameters) {
-        String id = parameters.get(0);
+        String id = parameters.get(1);
 
         for (int i = 0; i < cats.size(); i++) {
             if (cats.get(i).getId().equals(id)) {

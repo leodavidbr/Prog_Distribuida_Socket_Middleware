@@ -17,7 +17,7 @@ public class CreateCat {
     }
 
     public static String registerCat(List<String> parameters) {
-        Cat newCat = new Cat(parameters.get(0), parameters.get(1), parameters.get(2), parameters.get(3));
+        Cat newCat = new Cat(parameters.get(1), parameters.get(2), parameters.get(3), parameters.get(4));
         cats.add(newCat);
         return "Cat created: " + newCat.getName();
     }

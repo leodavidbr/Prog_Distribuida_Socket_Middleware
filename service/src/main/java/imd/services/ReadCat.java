@@ -17,7 +17,7 @@ public class ReadCat {
     }
 
     public static String readCat(List<String> parameters) {
-        String id = parameters.get(0);
+        String id = parameters.get(1);
         // System.out.println(" PRINTING all cats");
 
         for (int i = 0; i < cats.size(); i++) {
