@@ -1,7 +1,6 @@
 package imd.ufrn;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -15,10 +14,11 @@ public class SocketStub implements Runnable {
     Consumer<String> callbackFunctionMessageRecieved;
     static final String nameServiceHost = "127.0.0.1";
     static final int nameServicePort = 8888;
-    BufferedReader serviceReader;
+    // BufferedReader serviceReader;
 
     ReadWriteSocket nameServiceSocket;
-    private boolean connectedToNameService = false;
+    ReadWriteSocket serviceSocket;
+    // private boolean connectedToNameService = false;
 
     public SocketStub(Consumer<String> callbackFunctionMessageRecieved) {
         System.out.println("[socket] entered socket constructor");
@@ -49,7 +49,7 @@ public class SocketStub implements Runnable {
 
         String response = "";
         try {
-            System.out.println("waiting for response from nameService");
+            System.out.println("[socket] waiting for response from nameService");
             while (response == "") {
                 response = nameServiceSocket.getReadStream().readLine();
                 List<String> responseParams = Arrays.asList(response.split(";"));
@@ -57,7 +57,7 @@ public class SocketStub implements Runnable {
                 address.setPort(Integer.parseInt(responseParams.get(1)));
             }
         } catch (Exception e) {
-            System.out.println("problem while reading nameService response");
+            System.out.println("[socket] problem while reading nameService response");
             e.printStackTrace();
         }
         return address;
@@ -67,27 +67,30 @@ public class SocketStub implements Runnable {
         try {
             // Connect
             System.out.println(
-                    "connecting to service: host: " + serviceAddress.getHost() + " port: " + serviceAddress.getPort());
-            Socket serviceSocket;
+                    "[socket] connecting to service: host: " + serviceAddress.getHost() + " port: "
+                            + serviceAddress.getPort());
+            Socket serviceSocketTmp = new Socket(serviceAddress.getHost(), serviceAddress.getPort());
             PrintWriter write;
-            serviceSocket = new Socket(serviceAddress.getHost(), serviceAddress.getPort());
+            BufferedReader reader;
 
-            write = new PrintWriter(serviceSocket.getOutputStream(), true);
-            serviceReader = new BufferedReader(new InputStreamReader(serviceSocket.getInputStream()));
-            System.out.println("succesfully connected to service. Writing to service");
+            write = new PrintWriter(serviceSocketTmp.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(serviceSocketTmp.getInputStream()));
+            this.serviceSocket = new ReadWriteSocket(serviceSocketTmp, reader, write);
+
+            System.out.println("[socket] succesfully connected to service. Writing to service");
 
             // Send
             write.println(request);
-            System.out.println("wrote to service");
+            System.out.println("[socket] wrote to service");
 
         } catch (Exception e) {
-            System.out.println("could not initialize connection with name service");
+            System.out.println("[socket] could not initialize connection with name service");
             e.printStackTrace();
         }
     }
 
     private void initializeConnectionWithNameService() {
-        System.out.println("will try to connect to name service");
+        System.out.println("[socket] will try to connect to name service");
         try {
             Socket clientNamesServiceSocket = new Socket(nameServiceHost, nameServicePort);
 
@@ -96,11 +99,11 @@ public class SocketStub implements Runnable {
 
             this.nameServiceSocket = new ReadWriteSocket(clientNamesServiceSocket, read, write);
         } catch (Exception e) {
-            System.out.println("could not initialize connection with name service");
+            System.out.println("[socket] could not initialize connection with name service");
             e.printStackTrace();
         }
-        System.out.println("connected to name service succesfully");
-        connectedToNameService = true;
+        System.out.println("[socket] connected to name service succesfully");
+        // connectedToNameService = true;
     }
 
     @Override
@@ -111,29 +114,43 @@ public class SocketStub implements Runnable {
     private void getMessageLoop() {
         String message = "";
         // try {
+        System.out.println("[socket] entering get messageLoop");
         while (true) {
             message = getMessage();
-            System.out.println("Message recieved from client: \"" + message + "\"");
+            System.out.println("[socket] Message recieved from client: \"" + message + "\"");
             handleMessageRecieved(message);
         }
     }
 
     private String getMessage() {
-
+        int count = 0;
         String message = "";
         while (message == "") {
             try {
-                if (serviceReader == null) {
-                    // System.out.println("serviceReader null");
+                if (serviceSocket == null) {
+                    if (++count == 1000) {
+                        System.out.println("serviceReader null");
+                    }
                 } else {
-                    message = serviceReader.readLine();
+                    message = serviceSocket.getReadStream().readLine();
                 }
             } catch (Exception e) {
-                System.out.println("failed to read message");
+                System.out.println("[socket] failed to read message");
                 e.printStackTrace();
             }
         }
 
+        System.out.println("[socket] got message from server: \"" + message + "\". Closing the connection");
+        // Close old connection
+        try {
+            if (serviceSocket != null) {
+                System.out.println("[socket] closing old connection");
+                this.serviceSocket.getSocket().close();
+                this.serviceSocket = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return message;
     }
 }
