@@ -3,10 +3,14 @@ package imd.ufrn;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Random;
 
 public class App {
+    private static boolean messageWasRecieved = true;
 
     public static void main(String[] args) {
+        Random rand = new Random();
+        int rn = 2;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             System.out.println("creating stub");
             SocketStub stubClient = new SocketStub(message -> handleMessageRecieved(message));
@@ -15,6 +19,12 @@ public class App {
             System.out.println("stub created");
 
             while (true) {
+                if (!messageWasRecieved) {
+                    if (rand.nextInt(rn) == rn)
+                        rn++;
+                    continue;
+                }
+                messageWasRecieved = false;
                 System.out.println("\n*** Cat Management System ***");
                 System.out.println("1. Register Cat");
                 System.out.println("2. Update Cat");
@@ -98,6 +108,7 @@ public class App {
     }
 
     private static void handleMessageRecieved(String message) {
+        messageWasRecieved = true;
         System.out.println(message);
     }
 }
