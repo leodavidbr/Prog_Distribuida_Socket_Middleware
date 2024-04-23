@@ -72,6 +72,7 @@ public class App {
                             System.out.println("Failed to read cat");
 
                         }
+                        break;
                     case "4":
                         System.out.print("Enter id (to delete): ");
                         String idDelete = reader.readLine();
