@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import imd.ufrn.model.ReadWriteSocket;
@@ -123,13 +124,15 @@ public class SocketStub implements Runnable {
     }
 
     private String getMessage() {
-        int count = 0;
+        int count = 1;
+        Random rand = new Random();
         String message = "";
         while (message == "") {
             try {
                 if (serviceSocket == null) {
-                    if (++count == 1000) {
-                        System.out.println("serviceReader null");
+                    // Just so java doesnt optimize
+                    if (rand.nextInt(count) == count) {
+                        ++count;
                     }
                 } else {
                     message = serviceSocket.getReadStream().readLine();
